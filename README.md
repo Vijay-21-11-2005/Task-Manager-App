@@ -1,5 +1,7 @@
 # Task Manager App
 
+![Task Manager App Screenshot](Screenshots/screenshot.png)
+
 A web app where users sign up, log in and manage their own tasks. Built with PHP and MariaDB as a learning project.
 
 ## Features
