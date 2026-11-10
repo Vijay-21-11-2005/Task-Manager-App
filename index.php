@@ -42,59 +42,97 @@ $tasks = $stmt->fetchAll();
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>My Tasks - Task Manager</title>
+    <title>Dashboard - Task Manager</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Your Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fa-solid fa-list-check"></i> TaskMaster
+        </div>
+        <div class="nav-user">
+            <span><i class="fa-solid fa-user-circle"></i> <?= htmlspecialchars($_SESSION['username']) ?></span>
+            <a href="logout.php" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Log out</a>
+        </div>
+    </nav>
+
     <div class="container">
-    <h1>My Tasks</h1>
-    <p>Welcome, <?= htmlspecialchars($_SESSION['username']) ?>!
-       <a href="logout.php">Log out</a></p>
+        
+        <h1>Dashboard</h1>
+        
+        <!-- Add Task Form Card -->
+        <div class="add-task-container">
+            <h2><i class="fa-solid fa-plus-circle"></i> Add a new task</h2>
+            <?php if ($error): ?>
+                <p style="color:red; font-size: 0.9rem;"><?= htmlspecialchars($error) ?></p>
+            <?php endif; ?>
+            <form method="POST" class="add-task-form">
+                <input type="text" name="title" placeholder="What needs to be done?" maxlength="100" required>
+                <input type="date" name="due_date">
+                <select name="priority">
+                    <option>High</option>
+                    <option selected>Medium</option>
+                    <option>Low</option>
+                </select>
+                <button type="submit" class="btn-primary">Add Task</button>
+            </form>
+        </div>
 
-    <h2>Add a task</h2>
-    <?php if ($error): ?>
-        <p style="color:red;"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
-    <form method="POST">
-        <input type="text" name="title" placeholder="Task title" maxlength="100" required>
-        <input type="date" name="due_date">
-        <select name="priority">
-            <option>High</option>
-            <option selected>Medium</option>
-            <option>Low</option>
-        </select>
-        <button type="submit">Add</button>
-    </form>
+        <h2>Your Tasks</h2>
+        <?php if (count($tasks) === 0): ?>
+            <p>No tasks yet. Add your first one above.</p>
+        <?php else: ?>
+            <!-- Modern Grid Layout -->
+            <div class="task-grid">
+                <?php foreach ($tasks as $task): ?>
+                    <div class="task-card <?= $task['is_done'] ? 'completed' : '' ?>">
+                        
+                        <div class="task-header">
+                            <h3><?= htmlspecialchars($task['title']) ?></h3>
+                            <span class="badge priority-<?= strtolower($task['priority']) ?>">
+                                <?= htmlspecialchars($task['priority']) ?>
+                            </span>
+                        </div>
 
-    <h2>Your tasks</h2>
-    <?php if (count($tasks) === 0): ?>
-        <p>No tasks yet. Add your first one above.</p>
-    <?php else: ?>
-        <table border="1" cellpadding="6">
-            <tr><th>Title</th><th>Due date</th><th>Priority</th><th>Done?</th><th>Action</th><th>Delete</th></tr>
-            <?php foreach ($tasks as $task): ?>
-                <tr>                    
-                    <td><?= htmlspecialchars($task['title']) ?> <a href="edit.php?id=<?= (int)$task['id'] ?>">[Edit]</a></td>                    
-                    <td><?= htmlspecialchars($task['due_date'] ?? '-') ?></td>
-                    <td class="priority-<?= htmlspecialchars($task['priority']) ?>"><?= htmlspecialchars($task['priority']) ?></td>
-                    <td><?= $task['is_done'] ? 'Yes' : 'No' ?></td>
-                    <td>
-                        <form method="POST" action="toggle.php">
-                            <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
-                            <button type="submit"><?= $task['is_done'] ? 'Undo' : 'Mark done' ?></button>
-                        </form>
-                    </td>
-                    <td>
-                        <form method="POST" action="delete.php" onsubmit="return confirm('Delete this task?');">
-                            <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
-                            <button type="submit" class="btn-danger">Delete</button>
-                        </form>
-                    </td>                
-                </tr>
-            <?php endforeach; ?>
-        </table>
-    <?php endif; ?>
+                        <div class="task-body">
+                            <p><i class="fa-regular fa-calendar"></i> Due: <?= htmlspecialchars($task['due_date'] ?? 'No date') ?></p>
+                            <p>Status: <strong><?= $task['is_done'] ? 'Completed' : 'Pending' ?></strong></p>
+                        </div>
+
+                        <div class="task-actions">
+                            <!-- Edit Button -->
+                            <a href="edit.php?id=<?= (int)$task['id'] ?>" class="btn-icon btn-edit" title="Edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+
+                            <!-- Mark Done / Undo Form -->
+                            <form method="POST" action="toggle.php" style="display:inline;">
+                                <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                <button type="submit" class="btn-icon btn-toggle" title="<?= $task['is_done'] ? 'Undo' : 'Mark Done' ?>">
+                                    <i class="fa-solid <?= $task['is_done'] ? 'fa-rotate-left' : 'fa-check' ?>"></i>
+                                </button>
+                            </form>
+
+                            <!-- Delete Form -->
+                            <form method="POST" action="delete.php" style="display:inline;" onsubmit="return confirm('Delete this task?');">
+                                <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                <button type="submit" class="btn-icon btn-delete" title="Delete">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
     </div>
 </body>
 </html>
