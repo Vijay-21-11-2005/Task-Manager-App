@@ -38,24 +38,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container narrow">
-        <h1>Sign Up</h1>
+    <div class="container" style="max-width: 400px; margin-top: 80px;">
+        <div class="add-task-container">
+            <h2 style="justify-content: center; margin-bottom: 20px;"><i class="fa-solid fa-user-plus"></i> Create Account</h2>
+            
+            <?php if ($error): ?>
+                <p style="color:#e11d48; font-size: 0.9rem; margin-bottom: 15px; text-align: center;"><?= htmlspecialchars($error) ?></p>
+            <?php endif; ?>
+            <?php if ($success): ?>
+                <p style="color:#16a34a; font-size: 0.9rem; margin-bottom: 15px; text-align: center;"><?= htmlspecialchars($success) ?></p>
+            <?php endif; ?>
 
-        <?php if ($error): ?>
-            <p class="error"><?= htmlspecialchars($error) ?></p>
-        <?php endif; ?>
-        <?php if ($success): ?>
-            <p class="success"><?= htmlspecialchars($success) ?></p>
-        <?php endif; ?>
+            <form method="POST" class="add-task-form" style="flex-direction: column;">
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 0.9rem; color: #555; margin-bottom: 5px; display: block;">Username</label>
+                    <input type="text" name="username" required style="width: 100%;">
+                </div>
 
-        <form method="POST">
-            <label>Username:</label><br>
-            <input type="text" name="username" required><br><br>
-            <label>Password:</label><br>
-            <input type="password" name="password" required><br><br>
-            <button type="submit">Create Account</button>
-        </form>
-        <p>Already have an account? <a href="login.php">Log in</a></p>
+                <div style="margin-bottom: 25px;">
+                    <label style="font-size: 0.9rem; color: #555; margin-bottom: 5px; display: block;">Password</label>
+                    <input type="password" name="password" required style="width: 100%;">
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; margin-bottom: 15px;">Sign Up</button>
+                
+                <p style="text-align: center; font-size: 0.85rem; color: #666;">
+                    Already have an account? <a href="login.php" style="color: #111; font-weight: 600; text-decoration: none;">Log in</a>
+                </p>
+            </form>
+        </div>
     </div>
 </body>
 </html>
