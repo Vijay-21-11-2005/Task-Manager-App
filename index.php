@@ -87,6 +87,17 @@ $tasks = $stmt->fetchAll();
         </div>
 
         <h2>Your Tasks</h2>
+        <!-- Search and Filter Bar -->
+<div class="filter-bar">
+    <input type="text" id="searchInput" placeholder="Search tasks..." onkeyup="filterTasks()">
+    
+    <div class="filter-buttons">
+        <button class="filter-btn active" onclick="filterPriority('all', this)">All</button>
+        <button class="filter-btn" onclick="filterPriority('high', this)">High</button>
+        <button class="filter-btn" onclick="filterPriority('medium', this)">Medium</button>
+        <button class="filter-btn" onclick="filterPriority('low', this)">Low</button>
+    </div>
+</div>
         <?php if (count($tasks) === 0): ?>
             <p>No tasks yet. Add your first one above.</p>
         <?php else: ?>
@@ -135,4 +146,40 @@ $tasks = $stmt->fetchAll();
         <?php endif; ?>
     </div>
 </body>
+<script>
+    let currentPriority = 'all';
+
+    function filterTasks() {
+        const searchText = document.getElementById('searchInput').value.toLowerCase();
+        const cards = document.querySelectorAll('.task-card');
+
+        cards.forEach(card => {
+            const title = card.querySelector('h3').innerText.toLowerCase();
+            const badge = card.querySelector('.badge');
+            
+            let cardPriority = 'all';
+            if (badge.classList.contains('priority-high')) cardPriority = 'high';
+            if (badge.classList.contains('priority-medium')) cardPriority = 'medium';
+            if (badge.classList.contains('priority-low')) cardPriority = 'low';
+
+            const matchesSearch = title.includes(searchText);
+            const matchesPriority = (currentPriority === 'all' || cardPriority === currentPriority);
+
+            if (matchesSearch && matchesPriority) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function filterPriority(priority, btnElement) {
+        currentPriority = priority;
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        btnElement.classList.add('active');
+        filterTasks();
+    }
+</script>
 </html>
