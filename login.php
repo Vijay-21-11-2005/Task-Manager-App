@@ -27,22 +27,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login - Task Manager</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Login</h1>
+    <div class="container narrow">
+        <h1>Login</h1>
 
-    <?php if ($error): ?>
-        <p style="color:red;"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
+        <?php if ($error): ?>
+            <p class="error"><?= htmlspecialchars($error) ?></p>
+        <?php endif; ?>
 
-    <form method="POST">
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br><br>
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
-        <button type="submit">Log In</button>
-    </form>
-    <p>No account? <a href="register.php">Sign up</a></p>
+        <form method="POST">
+            <label>Username:</label><br>
+            <input type="text" name="username" required><br><br>
+            <label>Password:</label><br>
+            <input type="password" name="password" required><br><br>
+            <button type="submit">Log In</button>
+        </form>
+        <p>No account? <a href="register.php">Sign up</a></p>
+    </div>
 </body>
 </html>

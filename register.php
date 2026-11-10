@@ -32,24 +32,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sign Up - Task Manager</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Sign Up</h1>
+    <div class="container narrow">
+        <h1>Sign Up</h1>
 
-    <?php if ($error): ?>
-        <p style="color:red;"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
-    <?php if ($success): ?>
-        <p style="color:green;"><?= htmlspecialchars($success) ?></p>
-    <?php endif; ?>
+        <?php if ($error): ?>
+            <p class="error"><?= htmlspecialchars($error) ?></p>
+        <?php endif; ?>
+        <?php if ($success): ?>
+            <p class="success"><?= htmlspecialchars($success) ?></p>
+        <?php endif; ?>
 
-    <form method="POST">
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br><br>
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
-        <button type="submit">Create Account</button>
-    </form>
+        <form method="POST">
+            <label>Username:</label><br>
+            <input type="text" name="username" required><br><br>
+            <label>Password:</label><br>
+            <input type="password" name="password" required><br><br>
+            <button type="submit">Create Account</button>
+        </form>
+        <p>Already have an account? <a href="login.php">Log in</a></p>
+    </div>
 </body>
 </html>

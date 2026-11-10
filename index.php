@@ -42,9 +42,12 @@ $tasks = $stmt->fetchAll();
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>My Tasks - Task Manager</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="container">
     <h1>My Tasks</h1>
     <p>Welcome, <?= htmlspecialchars($_SESSION['username']) ?>!
        <a href="logout.php">Log out</a></p>
@@ -72,8 +75,9 @@ $tasks = $stmt->fetchAll();
             <tr><th>Title</th><th>Due date</th><th>Priority</th><th>Done?</th><th>Action</th><th>Delete</th></tr>
             <?php foreach ($tasks as $task): ?>
                 <tr>                    
-                    <td><?= htmlspecialchars($task['title']) ?> <a href="edit.php?id=<?= (int)$task['id'] ?>">[Edit]</a></td>                    <td><?= htmlspecialchars($task['due_date'] ?? '-') ?></td>
-                    <td><?= htmlspecialchars($task['priority']) ?></td>
+                    <td><?= htmlspecialchars($task['title']) ?> <a href="edit.php?id=<?= (int)$task['id'] ?>">[Edit]</a></td>                    
+                    <td><?= htmlspecialchars($task['due_date'] ?? '-') ?></td>
+                    <td class="priority-<?= htmlspecialchars($task['priority']) ?>"><?= htmlspecialchars($task['priority']) ?></td>
                     <td><?= $task['is_done'] ? 'Yes' : 'No' ?></td>
                     <td>
                         <form method="POST" action="toggle.php">
@@ -84,12 +88,13 @@ $tasks = $stmt->fetchAll();
                     <td>
                         <form method="POST" action="delete.php" onsubmit="return confirm('Delete this task?');">
                             <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
-                            <button type="submit">Delete</button>
+                            <button type="submit" class="btn-danger">Delete</button>
                         </form>
                     </td>                
                 </tr>
             <?php endforeach; ?>
         </table>
     <?php endif; ?>
+    </div>
 </body>
 </html>
