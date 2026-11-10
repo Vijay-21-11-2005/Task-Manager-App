@@ -1,32 +1,40 @@
-# Task Manager App
+# TaskMaster - Task Manager App
 
-![Task Manager App Screenshot](Screenshots/screenshot.png)
+A modern, full-stack task management web app where users can securely sign up, log in, and manage their daily tasks. Built with PHP, MariaDB, and JavaScript.
 
-A web app where users sign up, log in and manage their own tasks. Built with PHP and MariaDB as a learning project.
+## 📸 App Showcase
+
+| Dashboard & Filtering | Login Page |
+| :---: | :---: |
+| <img src="Screenshots/dashboard.png" width="400" alt="Dashboard"> | <img src="Screenshots/login.png" width="400" alt="Login"> |
+
+| Register Page | Edit Task |
+| :---: | :---: |
+| <img src="Screenshots/register.png" width="400" alt="Register"> | <img src="Screenshots/edit.png" width="400" alt="Edit Task"> |
 
 ## Features
-- Sign up and log in (passwords are hashed, never stored as plain text)
-- Add tasks with a title, due date and priority (High, Medium, Low)
-- Edit and delete tasks
-- Mark tasks as done or undo
-- Each user can only see and change their own tasks
+- **Authentication:** Secure signup and login (passwords hashed with `password_hash`).
+- **CRUD Operations:** Add, edit, delete, and mark tasks as complete.
+- **Real-time Filtering:** Instantly search tasks and filter by priority (High, Medium, Low) using JavaScript.
+- **Modern UI:** A clean, minimalist, responsive design using custom CSS and FontAwesome icons.
+- **Data Isolation:** Each user has a private dashboard and can only see their own tasks.
 
 ## Tech Stack
-- PHP 8 (backend)
-- MariaDB (database), accessed with PDO
-- HTML and CSS (pages)
-- XAMPP (local server)
+- **Backend:** PHP 8
+- **Database:** MariaDB (accessed securely using PDO)
+- **Frontend:** HTML, CSS, JavaScript
+- **Server:** XAMPP (local development)
 
 ## Security Practices
-- Passwords hashed with `password_hash` and checked with `password_verify`
-- Prepared statements to prevent SQL injection
-- Output escaped with `htmlspecialchars` to prevent XSS
-- Session ID regenerated after login
-- Every edit, delete and update is checked against the logged-in user's ID
+- Passwords hashed with `password_hash` and checked with `password_verify`.
+- Prepared statements (PDO) to prevent SQL injection.
+- Output escaped with `htmlspecialchars` to prevent XSS.
+- Session ID regenerated after login to prevent session hijacking.
+- Every edit, delete, and update is checked against the logged-in user's ID to prevent unauthorized access.
 
 ## How to Run Locally
 1. Install XAMPP and start **Apache** and **MySQL** in the XAMPP Control Panel.
-2. Put this project folder inside `C:\xampp\htdocs\`.
+2. Put this project folder inside `C:\xampp\htdocs\` (or create a junction link).
 3. Open `http://localhost/phpmyadmin`, create a database named `task_manager`, and run this SQL:
 
 ```sql
@@ -47,26 +55,3 @@ CREATE TABLE tasks (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
-```
-
-4. Check the database settings in `db.php` (host, port, user, password).
-5. Open `http://localhost/Task-Manager-App/register.php` to create an account.
-
-## Project Structure
-| File | Purpose |
-|------|---------|
-| `db.php` | Database connection |
-| `register.php` | Sign up |
-| `login.php` / `logout.php` | Log in and log out |
-| `index.php` | Task list and add task form |
-| `edit.php` | Edit a task |
-| `toggle.php` | Mark done or undo |
-| `delete.php` | Delete a task |
-
-## Planned Improvements
-- Better page design (CSS)
-- Login protection against repeated wrong passwords
-- Search and filter tasks
-
-## License
-All rights reserved. This code is for viewing only.

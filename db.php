@@ -1,10 +1,21 @@
 <?php
-// Database connection settings (XAMPP MariaDB)
-$host = 'localhost';
-$port = 3306;            // verified from XAMPP Control Panel
-$dbname = 'task_manager';
-$user = 'root';          // XAMPP default user
-$pass = '';              // XAMPP default: empty password
+// 1. Read the .env file securely
+$envFile = __DIR__ . '/.env';
+if (file_exists($envFile)) {
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue;
+        list($name, $value) = explode('=', $line, 2);
+        $_ENV[trim($name)] = trim($value);
+    }
+}
+
+// 2. Use the variables
+$host = $_ENV['DB_HOST'] ?? 'localhost';
+$port = $_ENV['DB_PORT'] ?? '3306';
+$dbname = $_ENV['DB_NAME'] ?? 'task_manager';
+$user = $_ENV['DB_USER'] ?? 'root';
+$pass = $_ENV['DB_PASS'] ?? '';
 
 try {
     $pdo = new PDO(
