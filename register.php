@@ -13,17 +13,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($password) < 6) {
         $error = 'Password must be at least 6 characters.';
     } else {
-        // Check if the username is already taken
         $stmt = $pdo->prepare('SELECT id FROM users WHERE username = ?');
         $stmt->execute([$username]);
 
         if ($stmt->fetch()) {
             $error = 'That username is already taken.';
         } else {
-            // Store a scrambled (hashed) password, never the real one
+            $stmt = $pdo->prepare('INSERT INTO workspaces (name) VALUES (?)');
+            $stmt->execute([$username . "'s Workspace"]);
+            $workspace_id = $pdo->lastInsertId();
+
             $hash = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $pdo->prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)');
             $stmt->execute([$username, $hash]);
+            $user_id = $pdo->lastInsertId();
+
+            $stmt = $pdo->prepare('INSERT INTO workspace_members (user_id, workspace_id, role) VALUES (?, ?, "admin")');
+            $stmt->execute([$user_id, $workspace_id]);
+
             $success = 'Account created. You can now log in.';
         }
     }
@@ -34,39 +41,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sign Up - Task Manager</title>
+    <title>Sign Up - TaskMaster</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container" style="max-width: 400px; margin-top: 80px;">
-        <div class="add-task-container">
-            <h2 style="justify-content: center; margin-bottom: 20px;"><i class="fa-solid fa-user-plus"></i> Create Account</h2>
-            
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div style="position: absolute; top: 20px; right: 20px;">
+                <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="theme-icon"></i></button>
+            </div>
+            <div class="auth-header">
+                <h1>Create Account</h1>
+                <p>Start organizing your work today</p>
+            </div>
             <?php if ($error): ?>
-                <p style="color:#e11d48; font-size: 0.9rem; margin-bottom: 15px; text-align: center;"><?= htmlspecialchars($error) ?></p>
+                <p style="color:#e11d48; font-size: 0.85rem; margin-bottom: 15px; text-align: center;"><?= htmlspecialchars($error) ?></p>
             <?php endif; ?>
             <?php if ($success): ?>
-                <p style="color:#16a34a; font-size: 0.9rem; margin-bottom: 15px; text-align: center;"><?= htmlspecialchars($success) ?></p>
+                <p style="color:#16a34a; font-size: 0.85rem; margin-bottom: 15px; text-align: center;"><?= htmlspecialchars($success) ?></p>
             <?php endif; ?>
-
-            <form method="POST" class="add-task-form" style="flex-direction: column;">
-                <div style="margin-bottom: 15px;">
-                    <label style="font-size: 0.9rem; color: #555; margin-bottom: 5px; display: block;">Username</label>
-                    <input type="text" name="username" required style="width: 100%;">
+            <form method="POST" class="auth-form">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" required>
                 </div>
-
-                <div style="margin-bottom: 25px;">
-                    <label style="font-size: 0.9rem; color: #555; margin-bottom: 5px; display: block;">Password</label>
-                    <input type="password" name="password" required style="width: 100%;">
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
                 </div>
-
-                <button type="submit" class="btn-primary" style="width: 100%; margin-bottom: 15px;">Sign Up</button>
-                
-                <p style="text-align: center; font-size: 0.85rem; color: #666;">
-                    Already have an account? <a href="login.php" style="color: #111; font-weight: 600; text-decoration: none;">Log in</a>
-                </p>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Sign Up</button>
             </form>
+            <div class="auth-footer">
+                Already have an account? <a href="login.php">Log in</a>
+            </div>
         </div>
     </div>
+    <script src="theme.js"></script>
 </body>
 </html>

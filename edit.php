@@ -2,16 +2,14 @@
 session_start();
 require 'db.php';
 
-// Only logged-in users can use this page
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
+$workspace_id = $_SESSION['workspace_id'];
 $error = '';
 
-// Save the changes when the form is sent
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $task_id = (int)($_POST['task_id'] ?? 0);
     $title = trim($_POST['title'] ?? '');
@@ -23,11 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!in_array($priority, ['High', 'Medium', 'Low'], true)) {
         $error = 'Invalid priority.';
     } else {
-        // Update the task, but ONLY if it belongs to this user
-        $stmt = $pdo->prepare(
-            'UPDATE tasks SET title = ?, due_date = ?, priority = ? WHERE id = ? AND user_id = ?'
-        );
-        $stmt->execute([$title, $due_date !== '' ? $due_date : null, $priority, $task_id, $user_id]);
+        $stmt = $pdo->prepare('UPDATE tasks SET title = ?, due_date = ?, priority = ? WHERE id = ? AND workspace_id = ?');
+        $stmt->execute([$title, $due_date !== '' ? $due_date : null, $priority, $task_id, $workspace_id]);
         header('Location: index.php');
         exit;
     }
@@ -35,9 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $task_id = (int)($_GET['id'] ?? 0);
 }
 
-// Load the task (only if it belongs to this user)
-$stmt = $pdo->prepare('SELECT id, title, due_date, priority FROM tasks WHERE id = ? AND user_id = ?');
-$stmt->execute([$task_id, $user_id]);
+$stmt = $pdo->prepare('SELECT id, title, due_date, priority FROM tasks WHERE id = ? AND workspace_id = ?');
+$stmt->execute([$task_id, $workspace_id]);
 $task = $stmt->fetch();
 
 if (!$task) {
@@ -48,63 +42,119 @@ if (!$task) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit Task - Task Manager</title>
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-<!-- FontAwesome Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- Your Custom CSS -->
-<link rel="stylesheet" href="style.css"> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit Task - TaskMaster</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body><body>
-    <!-- Reuse the Navbar for consistency -->
-    <nav class="navbar">
-        <div class="nav-brand">
-            <i class="fa-solid fa-list-check"></i> TaskMaster
-        </div>
-        <div class="nav-user">
-            <a href="index.php" class="btn-logout" style="background: #f1f5f9; color: #333;"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
-        </div>
-    </nav>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="nav-brand"><i class="fa-solid fa-layer-group"></i> TaskMaster</div>
+            <ul class="nav-links">
+                <li><a href="index.php"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
+                <li><a href="team.php"><i class="fa-solid fa-users-gear"></i> Team Admin</a></li>
+            </ul>
+            <div class="sidebar-bottom">
+                <button onclick="showLogoutModal()" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out</button>
+            </div>
+        </aside>
 
-    <div class="container">
-        <!-- Edit Form Card -->
-        <div class="add-task-container" style="max-width: 600px; margin: 40px auto;">
-            <h2><i class="fa-solid fa-pen-to-square"></i> Edit Task</h2>
-            
-            <?php if ($error): ?>
-                <p style="color:#e11d48; font-size: 0.9rem; margin-bottom: 15px;"><?= htmlspecialchars($error) ?></p>
-            <?php endif; ?>
-
-            <form method="POST" class="add-task-form" style="flex-direction: column;">
-                <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
-                
-                <div style="margin-bottom: 15px;">
-                    <label style="font-size: 0.9rem; color: #555; margin-bottom: 5px; display: block;">Title</label>
-                    <input type="text" name="title" value="<?= htmlspecialchars($task['title']) ?>" required style="width: 100%;">
+        <main class="main-content">
+            <header class="top-header">
+                <h1>Edit Task</h1>
+                <div class="header-actions">
+                    <button id="theme-toggle" class="btn-icon" title="Toggle Dark Mode" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="theme-icon"></i></button>
+                    <div class="user-profile"><i class="fa-solid fa-circle-user"></i> <?= htmlspecialchars($_SESSION['username']) ?></div>
                 </div>
+            </header>
 
-                <div style="margin-bottom: 15px;">
-                    <label style="font-size: 0.9rem; color: #555; margin-bottom: 5px; display: block;">Due Date</label>
-                    <input type="date" name="due_date" value="<?= htmlspecialchars($task['due_date'] ?? '') ?>" style="width: 100%;">
-                </div>
+            <div class="add-task-container" style="max-width: 600px;">
+                <h2><i class="fa-solid fa-pen-to-square"></i> Update your task</h2>
+                <?php if ($error): ?><p style="color:#e11d48; margin-bottom: 15px;"><?= htmlspecialchars($error) ?></p><?php endif; ?>
+                <form method="POST" class="edit-form" id="editForm">
+                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                    <div class="input-group">
+                        <label>Task Title</label>
+                        <input type="text" name="title" value="<?= htmlspecialchars($task['title']) ?>" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Due Date</label>
+                        <input type="date" name="due_date" value="<?= htmlspecialchars($task['due_date'] ?? '') ?>">
+                    </div>
+                    <div class="input-group">
+                        <label>Priority Level</label>
+                        <div class="custom-select">
+                            <select name="priority">
+                                <option <?= $task['priority'] === 'High' ? 'selected' : '' ?>>High</option>
+                                <option <?= $task['priority'] === 'Medium' ? 'selected' : '' ?>>Medium</option>
+                                <option <?= $task['priority'] === 'Low' ? 'selected' : '' ?>>Low</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                        <a href="index.php" class="btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
 
-                <div style="margin-bottom: 25px;">
-                    <label style="font-size: 0.9rem; color: #555; margin-bottom: 5px; display: block;">Priority</label>
-                    <select name="priority" style="width: 100%;">
-                        <option <?= $task['priority'] === 'High' ? 'selected' : '' ?>>High</option>
-                        <option <?= $task['priority'] === 'Medium' ? 'selected' : '' ?>>Medium</option>
-                        <option <?= $task['priority'] === 'Low' ? 'selected' : '' ?>>Low</option>
-                    </select>
-                </div>
-
-                <div style="display: flex; gap: 10px;">
-                    <button type="submit" class="btn-primary" style="flex: 1;">Save Changes</button>
-                    <a href="index.php" class="btn-primary" style="flex: 1; text-align: center; text-decoration: none; background: #e2e8f0; color: #333;">Cancel</a>
-                </div>
-            </form>
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 id="modalTitle">Are you sure?</h3>
+            <p id="modalMessage">You have unsaved changes.</p>
+            <div class="modal-actions">
+                <button id="modalCancelBtn" class="btn-secondary">Go Back</button>
+                <button id="modalConfirmBtn" class="btn-primary">Yes, Continue</button>
+            </div>
         </div>
     </div>
-</body>
+
+    <div id="logoutModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+            <h3>Log Out?</h3>
+            <p>Are you sure you want to log out of your workspace?</p>
+            <div class="modal-actions">
+                <button onclick="hideLogoutModal()" class="btn-secondary">Cancel</button>
+                <a href="logout.php" class="btn-primary" style="background: #ef4444; text-decoration: none; display: flex; align-items: center; justify-content: center;">Yes, Log Out</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="theme.js"></script>
+    <script>
+        const form = document.getElementById('editForm');
+        let formChanged = false;
+        const modal = document.getElementById('customModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+        const modalCancelBtn = document.getElementById('modalCancelBtn');
+        let actionToConfirm = null;
+
+        function showModal(title, message, action) { modalTitle.innerText = title; modalMessage.innerText = message; actionToConfirm = action; modal.classList.add('active'); }
+        function hideModal() { modal.classList.remove('active'); actionToConfirm = null; }
+        form.addEventListener('input', () => { formChanged = true; });
+        form.addEventListener('submit', (e) => { e.preventDefault(); showModal("Save Changes?", "Are you sure you want to update this task?", () => { formChanged = false; form.submit(); }); });
+        document.querySelector('.btn-secondary').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (formChanged) { showModal("Discard Changes?", "You have unsaved changes. Are you sure you want to cancel?", () => { window.location.href = 'index.php'; }); } 
+            else { window.location.href = 'index.php'; }
+        });
+        modalConfirmBtn.addEventListener('click', () => { if (actionToConfirm) actionToConfirm(); hideModal(); });
+        modalCancelBtn.addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
+
+        function showLogoutModal() { document.getElementById('logoutModal').classList.add('active'); }
+        function hideLogoutModal() { document.getElementById('logoutModal').classList.remove('active'); }
+        document.getElementById('logoutModal').addEventListener('click', (e) => { if (e.target.id === 'logoutModal') hideLogoutModal(); });
+    </script>
 </body>
 </html>

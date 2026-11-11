@@ -74,15 +74,13 @@ $members = $stmt->fetchAll();
 <body>
     <div class="app-container">
         <aside class="sidebar">
-            <div class="nav-brand">
-                <i class="fa-solid fa-layer-group"></i> TaskMaster
-            </div>
+            <div class="nav-brand"><i class="fa-solid fa-layer-group"></i> TaskMaster</div>
             <ul class="nav-links">
                 <li><a href="index.php"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
                 <li class="active"><a href="team.php"><i class="fa-solid fa-users-gear"></i> Team Admin</a></li>
             </ul>
             <div class="sidebar-bottom">
-                <button onclick="showLogoutModal()" class="logout-btn" style="background: none; border: none; width: 100%; cursor: pointer; text-align: left;">
+                <button onclick="showLogoutModal()" class="logout-btn">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> Log out
                 </button>
             </div>
@@ -92,58 +90,53 @@ $members = $stmt->fetchAll();
             <header class="top-header">
                 <h1>Team Management</h1>
                 <div class="header-actions">
-                    <button id="theme-toggle" class="btn-icon" title="Toggle Dark Mode" onclick="toggleTheme()">
-                        <i class="fa-solid fa-moon" id="theme-icon"></i>
-                    </button>
-                    <div class="user-profile">
-                        <i class="fa-solid fa-circle-user"></i> <?= htmlspecialchars($_SESSION['username']) ?> (Admin)
-                    </div>
+                    <button id="theme-toggle" class="btn-icon" title="Toggle Dark Mode" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="theme-icon"></i></button>
+                    <div class="user-profile"><i class="fa-solid fa-circle-user"></i> <?= htmlspecialchars($_SESSION['username']) ?> (Admin)</div>
                 </div>
             </header>
 
             <?php if ($message): ?>
-                <div class="toast show" style="position: relative; margin-bottom: 20px; transform: none; width: 100%; max-width: 800px; border-left-color: #10b981;">
+                <div class="toast show" style="position: relative; margin-bottom: 20px; transform: none; border-left-color: #10b981; box-shadow: none; border: 1px solid #eaeaea; border-left: 4px solid #10b981;">
                     <i class="fa-solid fa-circle-check" style="color: #10b981;"></i>
                     <div class="toast-content"><h4>Success!</h4><p><?= htmlspecialchars($message) ?></p></div>
                 </div>
             <?php endif; ?>
-            
             <?php if ($error): ?>
-                <div class="toast show" style="position: relative; margin-bottom: 20px; transform: none; width: 100%; max-width: 800px; border-left-color: #e11d48;">
+                <div class="toast show" style="position: relative; margin-bottom: 20px; transform: none; border-left-color: #e11d48; box-shadow: none; border: 1px solid #eaeaea; border-left: 4px solid #e11d48;">
                     <i class="fa-solid fa-triangle-exclamation" style="color: #e11d48;"></i>
                     <div class="toast-content"><h4>Error</h4><p><?= htmlspecialchars($error) ?></p></div>
                 </div>
             <?php endif; ?>
 
-            <div class="add-task-container" style="max-width: 800px; text-align: center; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none;">
+            <div class="add-task-container" style="text-align: center; background: #111; color: white; border: none;">
                 <h2 style="color: white; justify-content: center;"><i class="fa-solid fa-key"></i> Team Join Code</h2>
-                <p style="margin-bottom: 15px; opacity: 0.9;">Share this 6-digit code with your team so they can log in.</p>
-                <div style="font-size: 2.5rem; font-weight: 600; letter-spacing: 5px; background: rgba(255,255,255,0.2); padding: 10px 30px; border-radius: 10px; display: inline-block;">
+                <p style="margin-bottom: 15px; opacity: 0.9;">Share this code with your team so they can log in.</p>
+                <div style="font-size: 2.5rem; font-weight: 600; letter-spacing: 5px; background: rgba(255,255,255,0.1); padding: 10px 30px; border-radius: 8px; display: inline-block;">
                     <?= $workspace_id ?>
                 </div>
             </div>
 
-            <div class="add-task-container" style="max-width: 800px; margin-top: 20px; padding: 0; overflow: hidden;">
+            <div class="add-task-container" style="padding: 0; overflow: hidden;">
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
-                        <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb; text-align: left;">
-                            <th style="padding: 15px 20px; color: #374151;">Username</th>
-                            <th style="padding: 15px 20px; color: #374151;">Role</th>
-                            <th style="padding: 15px 20px; color: #374151; text-align: right;">Actions</th>
+                        <tr style="background: #f9fafb; border-bottom: 1px solid #eaeaea; text-align: left;">
+                            <th style="padding: 15px 20px; color: #333;">Username</th>
+                            <th style="padding: 15px 20px; color: #333;">Role</th>
+                            <th style="padding: 15px 20px; color: #333; text-align: right;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($members as $member): ?>
-                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                            <tr style="border-bottom: 1px solid #eaeaea;">
                                 <td style="padding: 15px 20px; display: flex; align-items: center; gap: 10px;">
-                                    <i class="fa-solid fa-circle-user" style="color: #6366f1; font-size: 1.2rem;"></i>
+                                    <i class="fa-solid fa-circle-user" style="color: #111; font-size: 1.2rem;"></i>
                                     <strong><?= htmlspecialchars($member['username']) ?></strong>
                                     <?php if ($member['id'] === $user_id): ?>
-                                        <span style="font-size: 0.7rem; background: #e0e7ff; color: #4f46e5; padding: 2px 8px; border-radius: 10px;">You</span>
+                                        <span style="font-size: 0.7rem; background: #f0f0f0; color: #111; padding: 2px 8px; border-radius: 10px;">You</span>
                                     <?php endif; ?>
                                 </td>
                                 <td style="padding: 15px 20px;">
-                                    <span style="background: <?= $member['role'] === 'admin' ? '#dcfce7' : '#f3f4f6' ?>; color: <?= $member['role'] === 'admin' ? '#16a34a' : '#4b5563' ?>; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">
+                                    <span style="background: <?= $member['role'] === 'admin' ? '#f0fdf4' : '#f9fafb' ?>; color: <?= $member['role'] === 'admin' ? '#16a34a' : '#666' ?>; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">
                                         <?= $member['role'] ?>
                                     </span>
                                 </td>
@@ -168,32 +161,26 @@ $members = $stmt->fetchAll();
         </main>
     </div>
 
-    <!-- CUSTOM CONFIRMATION MODAL -->
     <div id="customModal" class="modal-overlay">
         <div class="modal-box">
-            <div class="modal-icon" style="background: #fee2e2; color: #ef4444;">
-                <i class="fa-solid fa-user-xmark"></i>
-            </div>
+            <div class="modal-icon" style="background: #fef2f2; color: #ef4444;"><i class="fa-solid fa-user-xmark"></i></div>
             <h3>Remove Member?</h3>
             <p>Are you sure you want to remove this person from the team? They will lose access to all team tasks.</p>
             <div class="modal-actions">
                 <button id="modalCancelBtn" class="btn-secondary">Cancel</button>
-                <button id="modalConfirmBtn" class="btn-primary" style="background: #ef4444; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);">Yes, Remove</button>
+                <button id="modalConfirmBtn" class="btn-primary" style="background: #ef4444;">Yes, Remove</button>
             </div>
         </div>
     </div>
 
-    <!-- LOGOUT MODAL -->
     <div id="logoutModal" class="modal-overlay">
         <div class="modal-box">
-            <div class="modal-icon" style="background: #fee2e2; color: #ef4444;">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            </div>
+            <div class="modal-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
             <h3>Log Out?</h3>
             <p>Are you sure you want to log out of your workspace?</p>
             <div class="modal-actions">
                 <button onclick="hideLogoutModal()" class="btn-secondary">Cancel</button>
-                <a href="logout.php" class="btn-primary" style="background: #ef4444; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); text-decoration: none; display: flex; align-items: center; justify-content: center;">Yes, Log Out</a>
+                <a href="logout.php" class="btn-primary" style="background: #ef4444; text-decoration: none; display: flex; align-items: center; justify-content: center;">Yes, Log Out</a>
             </div>
         </div>
     </div>
@@ -227,7 +214,6 @@ $members = $stmt->fetchAll();
         modalCancelBtn.addEventListener('click', () => { modal.classList.remove('active'); formToSubmit = null; });
         modal.addEventListener('click', (e) => { if (e.target === modal) { modal.classList.remove('active'); formToSubmit = null; } });
 
-        // Logout Modal Logic
         function showLogoutModal() { document.getElementById('logoutModal').classList.add('active'); }
         function hideLogoutModal() { document.getElementById('logoutModal').classList.remove('active'); }
         document.getElementById('logoutModal').addEventListener('click', (e) => { if (e.target.id === 'logoutModal') hideLogoutModal(); });
