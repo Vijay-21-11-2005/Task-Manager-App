@@ -23,7 +23,32 @@ $stmt->execute([$user_id, $workspace_id]);
 $my_role = $stmt->fetchColumn();
 
 if ($my_role !== 'admin') {
-    die("Access Denied. Only Team Admins can view this page. <a href='index.php'>Go back</a>");
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Access Denied - TaskMaster</title>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="auth-wrapper">
+            <div class="auth-card" style="text-align: center;">
+                <div class="modal-icon" style="background: #fef2f2; color: #ef4444; margin: 0 auto 20px auto;">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h1 style="font-size: 1.5rem; margin-bottom: 10px;">Access Denied</h1>
+                <p style="color: #666; margin-bottom: 25px;">You do not have Admin privileges to view the Team Management dashboard.</p>
+                <a href="index.php" class="btn-primary" style="text-decoration: none; display: block; padding: 12px; border-radius: 6px;">Return to Dashboard</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
